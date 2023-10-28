@@ -10,8 +10,8 @@ from urllib3.exceptions import ProtocolError
 import time
 
 # change this file location to the location of your links csv file
-links_df = pd.read_csv("../Dataset/The Movies Dataset/links.csv", dtype={"imdbId": str})[3000:]
-csv_stid = 0
+links_df = pd.read_csv("../Dataset/The Movies Dataset/links.csv", dtype={"imdbId": str})[12000:24000]
+csv_stid = 5
 
 movie_data = {}
 missing_ids = []
