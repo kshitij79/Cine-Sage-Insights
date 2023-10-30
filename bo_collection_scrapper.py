@@ -1,42 +1,46 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import requests
-from bs4 import BeautifulSoup
-import pandas as pd
-from requests.exceptions import ConnectionError, Timeout
-from urllib3.exceptions import MaxRetryError
-from urllib3.exceptions import ProtocolError
-import time
+import sys
+from tqdm import tqdm
 
-# change this file location to the location of your links csv file
-links_df = pd.read_csv("../Dataset/The Movies Dataset/links.csv", dtype={"imdbId": str})[12000:24000]
-csv_stid = 5
+# Read links csv file path, range start and range end (exclusive) from input
+links_csv_path = sys.argv[1]
+range_start = int(sys.argv[2])
+range_end = int(sys.argv[3])
+links_df = pd.read_csv(links_csv_path, dtype={"imdbId": str})[range_start:range_end]
 
-movie_data = {}
+def save_data(start_row, end_row, revenue_data, missing_ids):
+    print("Saving data from rows {} to {}".format(start_row, end_row))
+    df = pd.DataFrame(revenue_data).set_index("imdbId")
+    df_columns = ["imdbid", "Movie Name"] + sorted([x for x in df.columns if x not in ("imdbid", "Movie Name")])
+    df = df.reindex(df_columns, axis=1)
+    df.to_csv(f"box_office_collection_{start_row}_{end_row}.csv", header=True)
+    
+    missing_df = pd.Series(missing_ids)
+    missing_df.to_csv(f"missing_ids_{start_row}_{end_row}.csv", index = False, header = False)
+
+
+revenue_data = []
 missing_ids = []
-# Counter to keep track of completed rows
-completed_rows = 0
 
-# Batch size - number of rows to scrape before saving to the CSV
+# Batch size - number of rows from links.csv to scrape before saving to the CSV
 batch_size = 1000  # Adjust as needed
 
-first_batch = True
+row_number = range_start
 
-# iterate over each imdb id
-for _, row in links_df.iterrows():
+for _, row in tqdm(links_df.iterrows(), total=links_df.shape[0]):
     imdbid = row["imdbId"]
-    url = f"https://www.boxofficemojo.com/title/tt{imdbid}/"  
+    url = f"https://www.boxofficemojo.com/title/tt{imdbid}/"
 
     response = requests.get(url, timeout=5)
     # send request to the web, request crashes after sometime so adding delays to help it recover 
     if response.status_code == 200:
+        movie_row = { "imdbId": imdbid }
         soup = BeautifulSoup(response.text, "html.parser")
-        movie_name = soup.find("h1", class_="a-size-extra-large").text.strip()
+        movie_row["Movie Name"] = soup.find("h1", class_="a-size-extra-large").text.strip()
         # skip the first table giving an overview of the box office collection
         table = soup.find_all("table", {"class", "a-bordered a-horizontal-stripes a-size-base-plus"})[1:]
-
-        movie_country_data = {}
 
         for region in table:
             column = 0
@@ -55,61 +59,25 @@ for _, row in links_df.iterrows():
                     cells = row.find_all("td")
                     country = cells[0].text.strip()
                     collection = cells[column].text.strip()
-                    movie_country_data[country] = collection
+                    movie_row[country] = collection
 
         # Add the movie's data to the main dictionary
-        if len(movie_country_data) > 0:
-            movie_data[movie_name] = movie_country_data
-
-        completed_rows += 1
-
-        if completed_rows % batch_size == 0:
-            # Save the data to the CSV file at the end of each batch
-            df = pd.DataFrame.from_dict(movie_data, orient="index")
-            df.index.name = "Movie Name"
-            df.reset_index(inplace=True)
-
-            # Append the data to the CSV file
-            df.to_csv(f"box_office_collection_{completed_rows/batch_size + csv_stid}.csv", mode="a", header=True, index=False, columns=df.columns)
-
-            # Clear the movie_data dictionary for the next batch
-            movie_data = {}
-
-            print("rows completed: ", completed_rows)
-            time.sleep(2)
+        if len(movie_row) > 2:
+            revenue_data.append(movie_row)
+        else:
+            missing_ids.append(imdbid)
 
     else:
         missing_ids.append(imdbid)
-        print(imdbid)
-        if len(missing_ids) % batch_size == 0:
-            df_missing = pd.DataFrame.from_records(missing_ids, orient="index")
-            df_missing.index.name = "Movie Name"
-            df_missing.reset_index(inplace=True)
-
-            # Append the data to the CSV file
-            df_missing.to_csv("missing_ids.csv", mode="a", header=False, index=False)
-
-            # Clear the movie_data dictionary for the next batch
-            missing_ids = []
+        print(imdbid, "missing")
+    
+    row_number += 1
+    
+    # If completed a batch, save the data
+    if row_number % batch_size == 0:
+        save_data(row_number-batch_size, row_number, revenue_data, missing_ids)
+        revenue_data = []
+        missing_ids = []
         
-
-
-if movie_data:
-    df = pd.DataFrame.from_dict(movie_data, orient="index")
-    df.index.name = "Movie Name"
-    df.reset_index(inplace=True)
-
-    # Append the data to the CSV file
-    df.to_csv("box_office_collection.csv", mode="a", header=True, index=False)
-
-if len(missing_ids) > 0:
-    df_missing = pd.DataFrame.from_dict(missing_ids, orient="index")
-    df_missing.index.name = "Movie Name"
-    df_missing.reset_index(inplace=True)
-
-    # Append the data to the CSV file
-    df_missing.to_csv("missing_ids.csv", mode="a", header=False, index=False)
-
-    # Clear the movie_data dictionary for the next batch
-    missing_ids = []
-
+if row_number % batch_size != 0:
+    save_data(row_number-row_number%batch_size, row_number, revenue_data, missing_ids)
