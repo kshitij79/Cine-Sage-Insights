@@ -4,6 +4,9 @@ import pandas as pd
 import sys
 from tqdm import tqdm
 
+# Usage: python bo_collection_scrapper.py <path to links.csv> <range start (inclusive)> <range end (exclusive)>
+# Example usage: python bo_collection_scrapper.py ../TheMoviesDataset/links.csv 0 12000
+
 # Read links csv file path, range start and range end (exclusive) from input
 links_csv_path = sys.argv[1]
 range_start = int(sys.argv[2])
