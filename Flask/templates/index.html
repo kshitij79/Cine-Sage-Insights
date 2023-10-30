@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CineSage-Insights</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #333;
+            padding: 10px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #555;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #888;
+        }
+
+        div.form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        textarea, select, input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CineSage-Insights</h1>
+        <!-- <nav>
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </nav> -->
+    </header>
+
+    <div class="form-group">
+        <label for="prompt">Movie Plot:</label>
+        <textarea id="prompt" rows="6" cols="50"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="budget">Budget (0 - 30 million):</label>
+        <input type="range" id="budget" min="0" max="30000000" step="100000" value="15000000">
+        <span id="budgetValue">15,000,000</span>
+    </div>
+
+    <div class="form-group">
+        <label for="country">Country:</label>
+        <select id="country">
+            <!-- Add country options here -->
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="language">Language:</label>
+        <select id="language">
+            <!-- Add language options here -->
+        </select>
+    </div>
+
+    <button id="predict">Predict Revenue</button>
+
+    <div>
+        <h2>Country-wise Revenue:</h2>
+        <div id="revenueChart"></div>
+    </div>
+</body>
+</html>
