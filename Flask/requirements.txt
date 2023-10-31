@@ -1,7 +1,2 @@
-# requirements.txt
-
-# Python version
-python==3.11.4
-
 # Flask for web application
 Flask==2.2.2
