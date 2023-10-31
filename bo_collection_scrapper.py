@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 # Read links csv file path, range start and range end (exclusive) from input
 links_csv_path = "../Dataset/The Movies Dataset/links.csv"
-range_start = int(24000)
+range_start = int(30000)
 range_end = int(36000)
 links_df = pd.read_csv(links_csv_path, dtype={"imdbId": str})[range_start:range_end]
 
