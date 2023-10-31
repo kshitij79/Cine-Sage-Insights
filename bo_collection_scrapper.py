@@ -8,9 +8,9 @@ from tqdm import tqdm
 # Example usage: python bo_collection_scrapper.py ../TheMoviesDataset/links.csv 0 12000
 
 # Read links csv file path, range start and range end (exclusive) from input
-links_csv_path = "../Dataset/The Movies Dataset/links.csv"
-range_start = int(30000)
-range_end = int(36000)
+links_csv_path = sys.argv[1]
+range_start = int(sys.argv[2])
+range_end = int(sys.argv[3])
 links_df = pd.read_csv(links_csv_path, dtype={"imdbId": str})[range_start:range_end]
 
 def save_data(start_row, end_row, revenue_data, missing_ids):
