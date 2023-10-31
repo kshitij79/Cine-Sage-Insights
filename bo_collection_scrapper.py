@@ -16,7 +16,7 @@ links_df = pd.read_csv(links_csv_path, dtype={"imdbId": str})[range_start:range_
 def save_data(start_row, end_row, revenue_data, missing_ids):
     print("Saving data from rows {} to {}".format(start_row, end_row))
     df = pd.DataFrame(revenue_data).set_index("imdbId")
-    df_columns = ["imdbid", "Movie Name"] + sorted([x for x in df.columns if x not in ("imdbid", "Movie Name")])
+    df_columns = ["imdbId", "Movie Name"] + sorted([x for x in df.columns if x not in ("imdbId", "Movie Name")])
     df = df.reindex(df_columns, axis=1)
     df.to_csv(f"box_office_collection_{start_row}_{end_row}.csv", header=True)
     
