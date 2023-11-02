@@ -6,3 +6,6 @@ __pycache__/
 
 # Ignore VSCode cache files
 .vscode/
+
+credits.csv
+ratings.csv
