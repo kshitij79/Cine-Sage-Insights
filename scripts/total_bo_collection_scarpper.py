@@ -11,26 +11,28 @@ def scrape_box_office_mojo(imdbid):
     bo_mojo_url = f"https://www.boxofficemojo.com/title/{imdbid}/"
 
     response = requests.get(bo_mojo_url, timeout=5)
-    reveune = 0
+    revenue = 0
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
         worldwide = soup.find_all("div", {"class", "a-section a-spacing-none mojo-performance-summary-table"})[0]
         if worldwide: 
-            revenue = worldwide.find("span", class_="money")
+            revenue = worldwide.find_all("span", class_="money")
 
             if revenue:
-                revenue = revenue.get_text()
+                revenue = revenue[-1].get_text()
             else:
                 return 0
         else:
-           return 0
+            return 0
+    else:
+        return 0
     
     return float(revenue.replace('$', '').replace(',', ''))
 
 def update_revenue():
-    st_idx = 25000
-    end_idx = 30000
-    movies_metadata_link = "downloaded/movies_metadata.csv"
+    st_idx = 1000
+    end_idx = 10000
+    movies_metadata_link = "dataset/downloaded/movies_metadata.csv"
     movies_metadata_csv = pd.read_csv(movies_metadata_link)
 
     batch_data = movies_metadata_csv[st_idx:end_idx]
