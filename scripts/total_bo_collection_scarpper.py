@@ -30,8 +30,8 @@ def scrape_box_office_mojo(imdbid):
     return float(revenue.replace('$', '').replace(',', ''))
 
 def update_revenue():
-    st_idx = 10000
-    end_idx = 20000
+    st_idx = 21000
+    end_idx = 30000
     movies_metadata_link = "dataset/downloaded/movies_metadata.csv"
     movies_metadata_csv = pd.read_csv(movies_metadata_link)
 
