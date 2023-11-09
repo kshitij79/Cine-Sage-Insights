@@ -16,18 +16,26 @@ def scrape_box_office_mojo(imdbid):
         soup = BeautifulSoup(response.text, "html.parser")
         worldwide = soup.find_all("div", {"class", "a-section a-spacing-none mojo-performance-summary-table"})[0]
         if worldwide: 
-         revenue = worldwide.find("span", class_="money").get_text()
+            revenue = worldwide.find("span", class_="money")
+
+            if revenue:
+                revenue = revenue.get_text()
+            else:
+                return 0
         else:
            return 0
     
-    return int(revenue.replace('$', ''))
+    return float(revenue.replace('$', '').replace(',', ''))
 
 def update_revenue():
+    st_idx = 25000
+    end_idx = 30000
+    movies_metadata_link = "downloaded/movies_metadata.csv"
+    movies_metadata_csv = pd.read_csv(movies_metadata_link)
 
-    movies_metadata_link = "../dataset/The Movies Dataset/movies_metadata.csv"
-    movies_metadata_csv = pd.read_csv(movies_metadata_link)[0:5000]
+    batch_data = movies_metadata_csv[st_idx:end_idx]
 
-    for idx, row in tqdm(movies_metadata_csv.iterrows(), total=movies_metadata_csv.shape[0]):
+    for idx, row in tqdm(batch_data.iterrows(), total=batch_data.shape[0]):
         revenue = row["revenue"]
 
         if revenue == 0:
@@ -36,9 +44,15 @@ def update_revenue():
             
 
         year = datetime.strptime(row["release_date"], "%Y-%m-%d").year
-        updated_revenue = cpi.inflate(revenue, year)
-        movies_metadata_csv.at[idx, "revenue"] = updated_revenue
+        updated_revenue = 0
+        if revenue != 0:
+            try:
+                updated_revenue = cpi.inflate(revenue, year)
+            except:
+                updated_revenue = revenue 
+        batch_data.at[idx, "revenue"] = updated_revenue
 
+    movies_metadata_csv.iloc[st_idx:end_idx, :] = batch_data
     movies_metadata_csv.to_csv(movies_metadata_link, index=False)
 
     
