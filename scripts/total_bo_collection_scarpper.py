@@ -30,12 +30,12 @@ def scrape_box_office_mojo(imdbid):
     return float(revenue.replace('$', '').replace(',', ''))
 
 def update_revenue():
-    st_idx = 30000
+    st_idx = 40000
     end_idx = 40000
     movies_metadata_link = "dataset/downloaded/movies_metadata.csv"
     movies_metadata_csv = pd.read_csv(movies_metadata_link)
 
-    batch_data = movies_metadata_csv[st_idx:end_idx]
+    batch_data = movies_metadata_csv[st_idx:]
 
     for idx, row in tqdm(batch_data.iterrows(), total=batch_data.shape[0]):
         revenue = row["revenue"]
@@ -54,7 +54,7 @@ def update_revenue():
                 updated_revenue = revenue 
         batch_data.at[idx, "revenue"] = updated_revenue
 
-    movies_metadata_csv.iloc[st_idx:end_idx, :] = batch_data
+    movies_metadata_csv.iloc[st_idx:, :] = batch_data
     movies_metadata_csv.to_csv(movies_metadata_link, index=False)
 
     
