@@ -30,4 +30,5 @@ def predict():
     return jsonify({'revenueData': revenueData})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)  # Set use_reloader to False to avoid duplicate output on some systems
+    print(f"Running on {app.config['SERVER_NAME']}")
