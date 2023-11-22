@@ -1,38 +1,47 @@
-
 function choropleth_map()
 {
-    var map_container = document.createElement('div');
+    alert("Choropleth map is ready!");
+    var svg  =d3.select("body")
+                .append("svg")
+                .attr("id", "”choropleth”")
+                .attr("width", 700)
+                .attr("height", 700)
 
-    var paragraph = document.createElement('p');
-    // Set the text content of the <p> element
-    paragraph.textContent = 'Additional information in the paragraph.';
 
-    // Append the text node and the <p> element to the new div
-    map_container.appendChild(paragraph);
-     // define the dimensions and margins for the graph
-     margin = ({top: 100, right: 100, bottom: 100, left: 100})
-     width = 960
-     height = 500
- 
-     // define function to parse time in years format
- 
-     // create scales x & y for X and Y axis and set their ranges
-     x = d3.scaleTime()
-           .range([margin.left, width - margin.right]);
-     y = d3.scaleLinear()
-           .range([height - margin.bottom, margin.top]);
- 
- 
-     // append svg element to the body of the page
-     // set dimensions and position of the svg element
-     var svg = d3.select("body")
-               .append("svg")
-               .attr("id", "svg1")
-               .attr("width", width)
-               .attr("height", height);
-     
-     var container = svg.append("g")
-             .attr("id", "container")
-    return svg
+    // Map and projection
     
+    var projection = d3.geoNaturalEarth1().scale(200)
+    var path = d3.geoPath(projection);
+
+    // Data and color scale
+    var data = d3.map();
+    var colorScale = d3.scaleThreshold()
+    .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
+    .range(d3.schemeBlues[7]);
+
+    // Load external data and boot
+    d3.queue()
+    .defer(d3.json, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
+    .defer(d3.csv, "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world_population.csv", function(d) { data.set(d.code, +d.pop); })
+    .await(ready);
+
+    function ready(error, topo) 
+    {
+
+        // Draw the map
+        svg.append("g")
+            .selectAll("path")
+            .data(topo.features)
+            .enter()
+            .append("path")
+            // draw each country
+            .attr("d", path
+            )
+            // set the color of each country
+            .attr("fill", function (d) {
+                d.total = data.get(d.id) || 0;
+                return colorScale(d.total);
+            });
+    }
+    return svg.node();
 }
