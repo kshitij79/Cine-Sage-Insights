@@ -9,3 +9,5 @@ __pycache__/
 
 credits.csv
 ratings.csv
+
+*.pth
