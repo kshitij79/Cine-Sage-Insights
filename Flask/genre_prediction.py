@@ -5,7 +5,7 @@ class GenrePredictor:
     def __init__(self, sigmoid_threshold=0.5):
         self.sigmoid_threshold = sigmoid_threshold
         self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-        self.model = AutoModelForSequenceClassification.from_pretrained("genre_prediction_model")
+        self.model = AutoModelForSequenceClassification.from_pretrained("static/genre_prediction_model")
         self.genre2id = {'genre_Action': 0,
             'genre_Adventure': 1,
             'genre_Animation': 2,
