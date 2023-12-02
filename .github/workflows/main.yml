@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x' # adjust if a specific minor version is needed
+        python-version: '3.9' # adjust if a specific minor version is needed
 
     - name: Install dependencies
       run: |

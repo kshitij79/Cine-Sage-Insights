@@ -8,21 +8,37 @@
     <script src="static/d3-tip.min.js"></script>
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="static/choropleth_map.js"></script>
+    <!-- <script src="static/choropleth_map.js"></script> -->
     <style>
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
-            padding: 20px;
+            padding: 60px 20px 20px;
         }
 
-        header {
+        /* header {
             background-color: #333;
             padding: 10px 20px;
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
+        } */
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #333;
+            padding: 10px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000; /* Set a high z-index to make sure it's above other elements */
         }
 
         header h1 {
@@ -48,7 +64,8 @@
         }
 
         div.form-group {
-            margin-bottom: 15px;
+            margin-top: 2em;
+            margin-bottom: 2em;
         }
 
         label {
@@ -76,17 +93,35 @@
         button:hover {
             background-color: #555;
         }
+
+        #revenueChart {
+            margin-left: 25em;
+            z-index: -1;
+            position: relative;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            padding: 8px;
+            border: 1px solid black;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>CineSage-Insights</h1>
-        <!-- <nav>
-            <a href="#">Home</a>
-            <a href="#">About</a>
-            <a href="#">Contact</a>
-        </nav> -->
+        <nav>
+            <a href="/">Home</a>
+            <a href="/cluster">Movie Review</a>
+            <!-- <a href="#">Contact</a>  -->
+        </nav>
     </header>
+
+    <div id="clusterTopic">
+        <h2>Script Revenue Analysis</h2>
+        <p>Dive into detailed analyses of movie plots, budgets, languages and revenue predictions across different countries and languages.</p>
+    </div>
 
     <div class="form-group">
         <label for="prompt">Movie Plot:</label>
@@ -95,16 +130,16 @@
 
     <div class="form-group">
         <label for="budget">Budget (0 - 30 million):</label>
-        <input type="range" id="budget" min="0" max="30000000" step="100000" value="15000000">
+        <input type="range" id="budget" min="0" max="30000000" step="100000" value="15000000" oninput="updateBudgetValue()">
         <span id="budgetValue">15,000,000</span>
     </div>
 
-    <div class="form-group">
+    <!-- <div class="form-group">
         <label for="country">Country:</label>
         <select id="country">
-            <!-- Add country options here -->
+            Add country options here
         </select>
-    </div>
+    </div> -->
 
     <div class="form-group">
         <label for="language">Language:</label>
@@ -120,7 +155,40 @@
         <div id="revenueChart"> </div>
     </div>
     <script>
-        document.getElementById('revenueChart').appendChild(choropleth_map());
+        function updateBudgetValue() {
+            const budgetInput = document.getElementById('budget');
+            const budgetValueSpan = document.getElementById('budgetValue');
+            budgetValueSpan.textContent = numberWithCommas(budgetInput.value);
+        }
+
+        // Function to add commas to a number for better readability
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        const languageList = ['Abkhazian', 'Afrikaans', 'Amharic', 
+        'Arabic', 'Aymara', 'Bulgarian', 'Bambara', 'Bengali', 'Tibetan', 
+        'Bosnian', 'Catalan', 'Chinese', 'Czech', 'Welsh', 'Danish', 'German', 
+        'Greek', 'English', 'Esperanto', 'Spanish', 'Estonian', 'Basque', 'Persian', 'Finnish', 
+        'French', 'Frisian', 'Galician', 'Hebrew', 'Hindi', 'Croatian', 'Hungarian', 'Armenian', 
+        'Indonesian', 'Icelandic', 'Italian', 'Inuktitut', 'Japanese', 'Javanese', 'Georgian', 'Kazakh', 
+        'Kannada', 'Korean', 'Kurdish', 'Kyrgyz', 'Latin', 'Luxembourgish', 'Lao', 'Lithuanian', 'Latvian', 'Macedonian', 'Malayalam', 
+        'Mongolian', 'Marathi', 'Malay', 'Maltese', 'Norwegian Bokmål', 'Nepali', 'Dutch', 'Norwegian', 'Punjabi', 'Polish', 'Pashto', 
+        'Portuguese', 'Quechua', 'Romanian', 'Russian', 'Kinyarwanda', 'Serbo-Croatian', 'Sinhalese', 'Slovak', 'Slovenian', 'Samoan', 
+        'Albanian', 'Serbian', 'Swedish', 'Tamil', 'Telugu', 'Tajik', 'Thai', 'Tagalog', 'Turkish', 'Ukrainian', 'Urdu', 'Uzbek', 
+        'Vietnamese', 'Wolof', 'Unknown', 'Chinese', 'Zulu', 'Nan']
+
+        // Select the language dropdown
+        const languageDropdown = document.getElementById('language');
+
+        // Add options to the dropdown
+        languageList.forEach((language) => {
+            const option = document.createElement('option');
+            option.value = language;
+            option.textContent = language;
+            languageDropdown.appendChild(option);
+        });
+        // document.getElementById('revenueChart').appendChild(choropleth_map());
     </script>
 </body>
 </html>

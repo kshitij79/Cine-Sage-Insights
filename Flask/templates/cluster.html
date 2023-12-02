@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineSage-Insights</title>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 60px 20px 20px;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #333;
+            padding: 10px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #555;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #888;
+        }
+
+        #clusterImages {
+            display: flex;
+            gap: 20px;
+            margin-top: 3em;
+            position: relative;
+        }
+
+        #clusterImages img {
+            max-width: 100%;
+            height: auto;
+            position: relative;
+        }
+
+        .highlight-dot {
+            position: absolute;
+            width: 2em;
+            height: 2em;
+            background-color: red;
+            border-radius: 50%;
+            opacity: 0.5;
+            transform: translate(-50%, -50%);
+        }
+
+        #genreInput {
+            margin-top: 2em;
+        }
+
+        #algorithmSelect {
+            margin-top: 2em;
+            margin-bottom: 1em;
+        }
+
+        #submitGenre {
+            margin-top: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submitGenre:hover {
+            background-color: #555;
+        }
+
+        #clusterOutput {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CineSage-Insights</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/cluster">Movie Review</a>
+        </nav>
+    </header>
+
+    <div id="clusterTopic">
+        <h2>Genre-Based Clustering Analysis</h2>
+        <p>Explore the clusters created using t-SNE visualization for different movie genres.</p>
+    </div>
+
+    <div id="clusterImages">
+        <!-- Add t-SNE visualizations here -->
+        <div class="highlight-dot" style="left: 30%; top: 40%;"></div>
+        <div class="highlight-dot" style="left: 70%; top: 60%;"></div>
+        <img src="{{ url_for('static', filename='k-means_clusters.PNG') }}" alt="t-SNE KMeans Cluster" id="kmeans">
+        
+        <div class="highlight-dot" style="left: 40%; top: 30%;"></div>
+        <div class="highlight-dot" style="left: 80%; top: 50%;"></div>
+        <img src="{{ url_for('static', filename='gmm_clusters.PNG') }}" alt="t-SNE GMM Cluster" id="gmm">
+    </div>
+
+    <div id="genreInput">
+        <div id="algorithmSelect">
+            <label for="algorithm">Select Cluster Algorithm:</label>
+            <select id="algorithm">
+                <option value="kmeans">KMeans</option>
+                <option value="gmm">GMM</option>
+            </select>
+        </div>
+
+        <label for="genre">Select Genre:</label>
+        <!-- <input type="text" id="genre" list="genres" placeholder="Enter a movie genre"> -->
+        <select id="genre">
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Animation">Animation</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Crime">Crime</option>
+            <option value="Documentary">Documentary</option>
+            <option value="Drama">Drama</option>
+            <option value="Family">Family</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Foreign">Foreign</option>
+            <option value="History">History</option>
+            <option value="Horror">Horror</option>
+            <option value="Music">Music</option>
+            <option value="Mystery">Mystery</option>
+            <option value="Romance">Romance</option>
+            <option value="Science Fiction">Science Fiction</option>
+            <option value="TV Movie">TV Movie</option>
+            <option value="Thriller">Thriller</option>
+            <option value="War">War</option>
+            <option value="Western">Western</option>
+        </select>
+    </div>
+
+    <button id="submitGenre" onclick="submitGenre()">Submit Genre</button>
+
+    <div id="clusterOutput">
+        <!-- Display the cluster name here -->
+    </div>
+
+    <script>
+        function submitGenre() {
+            const selectedAlgorithm = document.getElementById('algorithm').value;
+            const selectedGenre = document.getElementById('genre').value;
+            
+            // Add logic to determine the cluster based on the selected genre and algorithm
+            // For now, let's just log the selected genre and algorithm to the console
+            console.log(`Selected Algorithm: ${selectedAlgorithm}`);
+            console.log(`Selected Genre: ${selectedGenre}`);
+            
+            // Dummy logic to highlight dots on the images
+            if (selectedAlgorithm && selectedGenre)
+            highlightDots(selectedAlgorithm, selectedGenre);
+        }
+
+        function highlightDots(algorithm, genre) {
+            // Remove existing dots
+            const existingDots = document.querySelectorAll('.highlight-dot');
+            existingDots.forEach(dot => dot.remove());
+
+            // Dummy mapping of coordinates and cluster numbers
+            const mapping = {
+                Action: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 170, y: 80 },
+                    ]
+                },
+                Adventure: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Animation: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 240, y: 230 },
+                    ]
+                },
+                Comedy: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Crime: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Documentary: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Drama: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Family: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Fantasy: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Foreign: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                History: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Horror: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Music: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Mystery: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Romance: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                ScienceFiction: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                TVMovie: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Thriller: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                War: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                },
+                Western: {
+                    kmeans: [
+                        { x: 50, y: 15}
+                    ],
+                    gmm: [
+                        { x: 40, y: 30 },
+                    ]
+                }
+            };
+
+            // Get the corresponding mapping for the selected algorithm
+            const coordinates = mapping[genre] ? mapping[genre][algorithm] : [];
+            console.log(coordinates);
+            const image = document.getElementById(`${algorithm}`); // Add an ID to your image tag
+            const imageWidth = image.clientWidth;
+            const imageHeight = image.clientHeight;
+            // Highlight dots on the images
+            coordinates.forEach(coord => {
+                const dot = document.createElement('div');
+                dot.className = 'highlight-dot';
+                dot.style.left = `${(coord.x / 100)*imageWidth}px`;
+                dot.style.top = `${(coord.y / 100)*imageHeight}px`;
+                document.getElementById('clusterImages').appendChild(dot);
+            });
+        }
+    </script>
+</body>
+</html>
