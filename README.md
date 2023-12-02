@@ -3,6 +3,9 @@
 
 CineSage Insights is a project designed to redefine the movie production planning process by integrating data analysis and visualizations. This tool is specifically tailored for filmmakers, offering a novel approach to making data-driven decisions. It factors in various aspects such as plot premise, budget, star cast, release time-frame, and targeted geographies, enabling a comprehensive prediction and visualization of a movie's potential success and revenue.
 
+### Live Demo
+https://cinesageinsights.azurewebsites.net/
+
 ### Project Structure
 The repository is organized as follows:
 
