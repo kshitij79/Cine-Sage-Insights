@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from utils import predict_revenues
+# from utils import predict_revenues
 
 app = Flask(__name__, static_folder='static')
 
