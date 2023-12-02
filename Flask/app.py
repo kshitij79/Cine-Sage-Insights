@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template
+from utils import predict_revenues
 
 app = Flask(__name__, static_folder='static')
 
@@ -12,6 +13,7 @@ def predict_revenue(prompt, budget, country, language):
         {"country": "India", "revenue": budget*1.5},
     ]
 
+# predict_revenues(prompt, original_language, genres, budget)
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -25,7 +27,7 @@ def predict():
     country = data['country']
     language = data['language']
 
-    revenueData = predict_revenue(prompt, budget, country, language)
+    revenueData =  predict_revenue(prompt, budget, country, language) #predict_revenues(prompt, language, [], budget)
     
     return jsonify({'revenueData': revenueData})
 
