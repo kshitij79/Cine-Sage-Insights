@@ -58,3 +58,29 @@ def predict_revenues(prompt, original_language, genres, budget, device=DEVICE):
         prediction = model(inputs)
 
     return (1e8 * prediction).tolist()
+
+
+language_list = [
+    'ab', 'af', 'am', 'ar', 'ay', 'bg', 'bm', 'bn', 'bo', 'bs', 'ca', 'cn', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo',
+    'es', 'et', 'eu', 'fa', 'fi', 'fr', 'fy', 'gl', 'he', 'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'iu', 'ja', 'jv', 'ka',
+    'kk', 'kn', 'ko', 'ku', 'ky', 'la', 'lb', 'lo', 'lt', 'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'mt', 'nb', 'ne', 'nl', 'no',
+    'pa', 'pl', 'ps', 'pt', 'qu', 'ro', 'ru', 'rw', 'sh', 'si', 'sk', 'sl', 'sm', 'sq', 'sr', 'sv', 'ta', 'te', 'tg', 'th',
+    'tl', 'tr', 'uk', 'ur', 'uz', 'vi', 'wo', 'xx', 'zh', 'zu', 'nan'
+]
+
+language_mapping = {
+        'ab': 'Abkhazian', 'af': 'Afrikaans', 'am': 'Amharic', 'ar': 'Arabic', 'ay': 'Aymara', 'bg': 'Bulgarian',
+        'bm': 'Bambara', 'bn': 'Bengali', 'bo': 'Tibetan', 'bs': 'Bosnian', 'ca': 'Catalan', 'cn': 'Chinese',
+        'cs': 'Czech', 'cy': 'Welsh', 'da': 'Danish', 'de': 'German', 'el': 'Greek', 'en': 'English', 'eo': 'Esperanto',
+        'es': 'Spanish', 'et': 'Estonian', 'eu': 'Basque', 'fa': 'Persian', 'fi': 'Finnish', 'fr': 'French', 'fy': 'Frisian',
+        'gl': 'Galician', 'he': 'Hebrew', 'hi': 'Hindi', 'hr': 'Croatian', 'hu': 'Hungarian', 'hy': 'Armenian', 'id': 'Indonesian',
+        'is': 'Icelandic', 'it': 'Italian', 'iu': 'Inuktitut', 'ja': 'Japanese', 'jv': 'Javanese', 'ka': 'Georgian',
+        'kk': 'Kazakh', 'kn': 'Kannada', 'ko': 'Korean', 'ku': 'Kurdish', 'ky': 'Kyrgyz', 'la': 'Latin', 'lb': 'Luxembourgish',
+        'lo': 'Lao', 'lt': 'Lithuanian', 'lv': 'Latvian', 'mk': 'Macedonian', 'ml': 'Malayalam', 'mn': 'Mongolian',
+        'mr': 'Marathi', 'ms': 'Malay', 'mt': 'Maltese', 'nb': 'Norwegian Bokmål', 'ne': 'Nepali', 'nl': 'Dutch',
+        'no': 'Norwegian', 'pa': 'Punjabi', 'pl': 'Polish', 'ps': 'Pashto', 'pt': 'Portuguese', 'qu': 'Quechua',
+        'ro': 'Romanian', 'ru': 'Russian', 'rw': 'Kinyarwanda', 'sh': 'Serbo-Croatian', 'si': 'Sinhalese', 'sk': 'Slovak',
+        'sl': 'Slovenian', 'sm': 'Samoan', 'sq': 'Albanian', 'sr': 'Serbian', 'sv': 'Swedish', 'ta': 'Tamil', 'te': 'Telugu',
+        'tg': 'Tajik', 'th': 'Thai', 'tl': 'Tagalog', 'tr': 'Turkish', 'uk': 'Ukrainian', 'ur': 'Urdu', 'uz': 'Uzbek',
+        'vi': 'Vietnamese', 'wo': 'Wolof', 'xx': 'Unknown', 'zh': 'Chinese', 'zu': 'Zulu', 'nan': 'Nan'
+    }

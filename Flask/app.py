@@ -4,7 +4,7 @@ from utils import predict_revenues
 app = Flask(__name__, static_folder='static')
 
 # Replace with your BERT model loading and prediction code
-def predict_revenue(prompt, budget, country, language):
+def predict_revenue(prompt, budget, language):
     # print(prompt, budget, country, language)
     # This is dummy data for illustration purposes
     return [
@@ -18,16 +18,20 @@ def predict_revenue(prompt, budget, country, language):
 def index():
     return render_template('index.html')
 
+@app.route('/cluster')
+def index_cluster():
+    return render_template('cluster.html')
+
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
     print(data)
     prompt = data['prompt']
     budget = int(data['budget'])
-    country = data['country']
+    # country = data['country']
     language = data['language']
 
-    revenueData =  predict_revenue(prompt, budget, country, language) #predict_revenues(prompt, language, [], budget)
+    revenueData =  predict_revenue(prompt, budget, language) #predict_revenues(prompt, language, [], budget)
     
     return jsonify({'revenueData': revenueData})
 

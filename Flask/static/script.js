@@ -72,13 +72,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Fetch input values
     const prompt = document.getElementById('prompt').value;
     const budget = document.getElementById('budget').value;
-    const country = document.getElementById('country').value;
+    // const country = document.getElementById('country').value;
     const language = document.getElementById('language').value;
 
     // Make an API request to your Flask server
     fetch('/predict', {
       method: 'POST',
-      body: JSON.stringify({ prompt, budget, country, language }),
+      body: JSON.stringify({ prompt, budget, language }),
       headers: {
         'Content-Type': 'application/json',
       },
