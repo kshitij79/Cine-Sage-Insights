@@ -96,6 +96,12 @@
         button:hover {
             background-color: #555;
         }
+        
+        button[disabled] {
+            cursor: not-allowed;
+            background-color: #666; /* Adjust the color to your preference for disabled state */
+            color: #ccc; /* Adjust the color to your preference for disabled state */
+        }
 
         #revenueChart {
             margin-left: 25em;
@@ -109,6 +115,21 @@
             border: 1px solid black;
             opacity: 0.8;
         }
+        
+        .tag-pill {
+            display: inline-block;
+            background-color: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .tag-pill:hover {
+            background-color: #45a049;
+        }
+        
     </style>
 </head>
 <body>
@@ -156,6 +177,12 @@
             <option value="Western">Western</option>
         </select>
     </div>
+    <span id="genreSuggestionsSpan" style="margin-top: 10px;">
+        Suggested genres:
+        <div id="genreSuggestions" style="margin-left: 10px; display: inline-block;"></div>
+    </span>
+    <button id="acceptAllSuggestions" class="btn btn-primary" style="margin-top: 10px; margin-left: 10px;" disabled>Accept All</button>
+
 
     <div class="form-group">
         <label for="budget">Budget (0 - 30 million):</label>
@@ -231,43 +258,87 @@
 
         // After a user is done typing, fill out genres (if not already filled out by user) using the API
         var userTypingTimer;
-        var typingWaitMilliseconds = 5000;
+        var typingWaitMilliseconds = 500;
         var $input = $('#prompt');
-        var hasUserSelectedGenres = false;
         var $genresElement = $('#genres');
-        
-        $genresElement.on('select2:select', function (e) {
-            hasUserSelectedGenres = true;
-            clearTimeout(userTypingTimer);
-        });
+        var $genreSuggestions = $('#genreSuggestions');
         
         $input.on('keyup', function () {
             clearTimeout(userTypingTimer);
-            if ($input.val() && !hasUserSelectedGenres) {
+            if ($input.val()) {
                 userTypingTimer = setTimeout(finishedTypingPlot, typingWaitMilliseconds);
             }
         });
 
+        function getGenreSuggestions(plot) {
+            $.ajax({
+                url: '/api/genres',
+                type: 'POST',
+                data: JSON.stringify({ plot: plot }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function(data) {
+                    displayGenreSuggestions(data.genres);
+                }
+            });
+        }
+
+        function appendToGenres(genre) {
+            var currentGenres = $genresElement.select2('data');
+            if (typeof genre === 'string') {
+                genre = [genre];
+            }
+            updatedGenres = currentGenres.map(function(currentGenre) {
+                return currentGenre.text;
+            });
+            for (var i = 0; i < genre.length; i++) {
+                if (!updatedGenres.includes(genre[i])) {
+                    updatedGenres.push(genre[i]);
+                }
+            }
+            $genresElement.val(updatedGenres).trigger('change');
+        }
+
+        function displayGenreSuggestions(suggestions) {
+            $genreSuggestions.empty();
+            $('#acceptAllSuggestions').prop('disabled', true);
+    
+            // Create buttons for each suggestion
+            suggestions.forEach(function(suggestion) {
+                var suggestionButton = $('<button class="btn tag-pill"></button>');
+                suggestionButton.text(suggestion);
+    
+                suggestionButton.on('click', function() {
+                    appendToGenres(suggestion);
+                    suggestionButton.remove();
+                });
+    
+                // Append the suggestion button to the suggestions div
+                $genreSuggestions.append(suggestionButton);
+            });
+            $('#acceptAllSuggestions').prop('disabled', false);
+        }
+    
+
         function finishedTypingPlot () {
             const plot = document.getElementById('prompt').value;
             if (plot.length > 0) {
-                if (!hasUserSelectedGenres) {
-                    $.ajax({
-                        url: '/api/genres',
-                        type: 'POST',
-                        data: JSON.stringify({plot: plot}),
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        success: function (data) {
-                            genre_list = data.genres;
-                            // Set the genres dropdown to the genres returned by the API, options already exist for sure
-                            // $genresElement is a Select2 element
-                            $genresElement.val(genre_list).trigger('change');
-                        }
-                    });
-                }
+                getGenreSuggestions(plot);
             }
         }
+
+        $('#acceptAllSuggestions').on('click', function() {
+            // Get all suggestions and add them to the genres dropdown
+            var suggestions = $genreSuggestions.find('button').map(function() {
+                return $(this).text();
+            }).get();
+            appendToGenres(suggestions);
+            // Disable the accept all button instead of removing it
+            $('#acceptAllSuggestions').prop('disabled', true);
+    
+            // Clear the suggestions div
+            $genreSuggestions.empty();
+        });
 
     </script>
 </body>
