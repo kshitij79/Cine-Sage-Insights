@@ -64,11 +64,11 @@
 
         .highlight-dot {
             position: absolute;
-            width: 2em;
-            height: 2em;
+            width: 6em;
+            height: 6em;
             background-color: red;
-            border-radius: 50%;
-            opacity: 0.5;
+            border-radius: 30%;
+            opacity: 0.2;
             transform: translate(-50%, -50%);
         }
 
@@ -117,12 +117,12 @@
 
     <div id="clusterImages">
         <!-- Add t-SNE visualizations here -->
-        <div class="highlight-dot" style="left: 30%; top: 40%;"></div>
-        <div class="highlight-dot" style="left: 70%; top: 60%;"></div>
+        <div class="highlight-dot" style="left: 30%; top: 40%; opacity: 0;"></div>
+        <div class="highlight-dot" style="left: 70%; top: 60%; opacity: 0;"></div>
         <img src="{{ url_for('static', filename='k-means_clusters.PNG') }}" alt="t-SNE KMeans Cluster" id="kmeans">
         
-        <div class="highlight-dot" style="left: 40%; top: 30%;"></div>
-        <div class="highlight-dot" style="left: 80%; top: 50%;"></div>
+        <div class="highlight-dot" style="left: 40%; top: 30%; opacity: 0;"></div>
+        <div class="highlight-dot" style="left: 80%; top: 50%; opacity: 0;"></div>
         <img src="{{ url_for('static', filename='gmm_clusters.PNG') }}" alt="t-SNE GMM Cluster" id="gmm">
     </div>
 
@@ -139,14 +139,14 @@
         <!-- <input type="text" id="genre" list="genres" placeholder="Enter a movie genre"> -->
         <select id="genre">
             <option value="Action">Action</option>
-            <option value="Adventure">Adventure</option>
+            <!-- <option value="Adventure">Adventure</option> -->
             <option value="Animation">Animation</option>
             <option value="Comedy">Comedy</option>
-            <option value="Crime">Crime</option>
-            <option value="Documentary">Documentary</option>
+            <!-- <option value="Crime">Crime</option> -->
+            <!-- <option value="Documentary">Documentary</option> -->
             <option value="Drama">Drama</option>
             <option value="Family">Family</option>
-            <option value="Fantasy">Fantasy</option>
+            <!-- <option value="Fantasy">Fantasy</option> -->
             <option value="Foreign">Foreign</option>
             <option value="History">History</option>
             <option value="Horror">Horror</option>
@@ -157,7 +157,7 @@
             <option value="TV Movie">TV Movie</option>
             <option value="Thriller">Thriller</option>
             <option value="War">War</option>
-            <option value="Western">Western</option>
+            <!-- <option value="Western">Western</option> -->
         </select>
     </div>
 
@@ -191,18 +191,10 @@
             const mapping = {
                 Action: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 45, y: 55}
                     ],
                     gmm: [
-                        { x: 170, y: 80 },
-                    ]
-                },
-                Adventure: {
-                    kmeans: [
-                        { x: 50, y: 15}
-                    ],
-                    gmm: [
-                        { x: 40, y: 30 },
+                        { x: 130, y: 80 },
                     ]
                 },
                 Animation: {
@@ -210,143 +202,103 @@
                         { x: 50, y: 15}
                     ],
                     gmm: [
-                        { x: 240, y: 230 },
+                        { x: 170, y: 80 },
                     ]
                 },
                 Comedy: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 45, y: 55}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
-                    ]
-                },
-                Crime: {
-                    kmeans: [
-                        { x: 50, y: 15}
-                    ],
-                    gmm: [
-                        { x: 40, y: 30 },
-                    ]
-                },
-                Documentary: {
-                    kmeans: [
-                        { x: 50, y: 15}
-                    ],
-                    gmm: [
-                        { x: 40, y: 30 },
+                        { x: 180, y: 50 },
                     ]
                 },
                 Drama: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 45, y: 55}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
+                        { x: 160, y: 65 },
                     ]
                 },
                 Family: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 55, y: 15}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
-                    ]
-                },
-                Fantasy: {
-                    kmeans: [
-                        { x: 50, y: 15}
-                    ],
-                    gmm: [
-                        { x: 40, y: 30 },
+                        { x: 130, y: 80 },
                     ]
                 },
                 Foreign: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 80, y: 45}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
+                        { x: 170, y: 80 },
                     ]
                 },
                 History: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 62, y: 85}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
+                        { x: 125, y: 75 },
                     ]
                 },
                 Horror: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 62, y: 85}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
+                        { x: 125, y: 75 },
                     ]
                 },
                 Music: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 55, y: 15}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
-                    ]
-                },
-                Mystery: {
-                    kmeans: [
-                        { x: 50, y: 15}
-                    ],
-                    gmm: [
-                        { x: 40, y: 30 },
+                        { x: 125, y: 75 },
                     ]
                 },
                 Romance: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 45, y: 55}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
+                        { x: 140, y: 30 },
                     ]
                 },
                 ScienceFiction: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 20, y: 45}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
+                        { x: 140, y: 30 },
                     ]
                 },
                 TVMovie: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 20, y: 45}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
+                        { x: 140, y: 30 },
                     ]
                 },
                 Thriller: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 45, y: 55}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
+                        { x: 180, y: 50 },
                     ]
                 },
                 War: {
                     kmeans: [
-                        { x: 50, y: 15}
+                        { x: 80, y: 45}
                     ],
                     gmm: [
-                        { x: 40, y: 30 },
-                    ]
-                },
-                Western: {
-                    kmeans: [
-                        { x: 50, y: 15}
-                    ],
-                    gmm: [
-                        { x: 40, y: 30 },
+                        { x: 170, y: 80 },
                     ]
                 }
             };
