@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, render_template
 from genre_prediction import GenrePredictor
 from countrywise_revenue_predictor import WorldWideRevenuePredictor
 from overall_revenue_predictor import OverallRevenuePredictor
-from utils import inverted_language_mapping
 import random
 
 app = Flask(__name__, static_folder='static')
