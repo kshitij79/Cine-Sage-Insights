@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const margin = { top: 20, right: 30, bottom: 40, left: 50 };
     const width = 1100 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
-    const legendWidth = 110;
+    const legendWidth = 102;
 
     const svg = d3.select('#revenueChart')
         .append("svg")
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     
     const colorScale = d3.scaleThreshold()
         .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
-        .range(d3.schemeReds[4]);
+        .range(d3.schemeReds[7]);
 
     // Legend with labels in USD using shorthands like M for million and K for thousand
     const legend = d3.legendColor().scale(colorScale).labels(
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     ));
     const legendG = svg.append("g")
         .attr("id", "legend")
-        .attr("transform", "translate(" + (width - legendWidth + 50) + "," + (margin.top) + ")")
+        .attr("transform", "translate(" + (width - legendWidth + 50) + "," + (margin.top + 120) + ")")
         .attr("display", "none")
         .call(legend);
 

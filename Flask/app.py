@@ -15,28 +15,29 @@ if not USE_RANDOM:
 
 def random_predict_revenue(prompt, budget, original_language):        
     print(prompt, budget, original_language)
-    language_to_countries = {
-        "en": ["USA", "UK", "India", "Australia", "Canada"],
-        "es": ["Argentina", "Mexico", "Spain"],
-        "fr": ["France", "Canada"],
-        "de": ["Germany", "Austria", "Switzerland"],
-        "ko": ["South Korea"],
-        "zh": ["Taiwan"],
-        "hi": ["India"],
-        "pt": ["Brazil", "Portugal"]
-        # Add more languages and countries as needed
-    }
+    # language_to_countries = {
+    #     "en": ["USA", "UK", "India", "Australia", "Canada"],
+    #     "es": ["Argentina", "Mexico", "Spain"],
+    #     "fr": ["France", "Canada"],
+    #     "de": ["Germany", "Austria", "Switzerland"],
+    #     "ko": ["South Korea"],
+    #     "zh": ["Taiwan"],
+    #     "hi": ["India"],
+    #     "pt": ["Brazil", "Portugal"]
+    #     # Add more languages and countries as needed
+    # }
 
-    eligible_countries = language_to_countries.get(original_language, ["USA", "UK", "India"])
+    # eligible_countries = language_to_countries.get(original_language, ["USA", "UK", "India"])
 
-    # Randomly selecting countries and calculating revenues
-    random_countries = random.sample(eligible_countries, k=len(eligible_countries))
+    # # Randomly selecting countries and calculating revenues
+    # random_countries = random.sample(eligible_countries, k=len(eligible_countries))
+    random_countries = ['Argentina', 'Australia', 'Austria', 'Belgium', 'United States of America', 'Korea, South', 'Spain', 'Taiwan', 'United Kingdom', 'France', 'Germany', 'New Zealand', 'Portugal', 'Russia']
     results = []
     budget = int(budget) * 1e6
     for country in random_countries:
-        if country == "USA":
+        if country == "United States of America":
             revenue = random.uniform(4, 6) * budget  # Random multiplier between 4 and 6
-        elif country == "UK":
+        elif country == "United Kingdom":
             revenue = random.uniform(1.5, 2.5) * budget  # Random multiplier between 1.5 and 2.5
         elif country == "India":
             revenue = random.uniform(1, 2) * budget  # Random multiplier between 1 and 2
