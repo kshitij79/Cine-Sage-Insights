@@ -77,7 +77,9 @@ def predict():
         'overview': data['prompt'],
         'budget': int(data['budget']),
         'original_language': data['language'],
-        'genre_list': data['genres']
+        'genre_list': data['genres'],
+        'cast': data['top_cast'],
+        'crew': data['top_crew']
     }
     revenue_data = []
     overall_revenue = int(overall_revenue_predictor.predict_revenue(movie_data))

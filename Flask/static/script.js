@@ -96,12 +96,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // const country = document.getElementById('country').value;
     const language = document.getElementById('language').value;
     const genres = $('#genres').select2('data').map(d => d.text);
+    const top_cast = $('#top_cast').select2('data').map(d => d.text);
+    const top_crew = $('#top_crew').select2('data').map(d => d.text);
     spinner.spin(document.body);
 
     // Make an API request to your Flask server
     fetch('/predict', {
       method: 'POST',
-      body: JSON.stringify({ prompt, budget, language, genres }),
+      body: JSON.stringify({ prompt, budget, language, genres, top_cast, top_crew }),
       headers: {
         'Content-Type': 'application/json',
       },

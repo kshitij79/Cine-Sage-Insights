@@ -205,6 +205,16 @@
         </select>
     </div>
 
+    <div class="form-group" style="margin-bottom: 10px;">
+        <label for="top_cast">Top Cast</label>
+        <select id="top_cast" class="form-control"  multiple="multiple"></select>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 10px;">
+        <label for="top_crew">Top Crew</label>
+        <select id="top_crew" class="form-control"  multiple="multiple"></select>
+    </div>
+
     <div style="text-align: center;">
         <button id="predict" style="margin-bottom: 10px; background-color: #2196F3; color: white;">
         Predict Revenue</button>
@@ -221,13 +231,29 @@
     </div>
     <script>
         $(document).ready(function() {
-            $('#genres').select2({
-                allowClear: true,
-                tokenSeparators: [',', ' '],
-                placeholder: "Select or type genres",
-                closeOnSelect: false,
-                multiple: true,
+            const selects = [{id: 'genres', name: 'genres'}, {id: 'top_cast', name: 'top cast members'}, {id: 'top_crew', name: 'top crew members'}];
+            selects.forEach(function(select) {
+                $(`#${select.id}`).select2({
+                    allowClear: true,
+                    tokenSeparators: [',', ' '],
+                    placeholder: `Select or type ${select.name}`,
+                    closeOnSelect: false,
+                    multiple: true,
+                });
             });
+        });
+
+        // Load 'static/top_cast_crew.json' and populate the top cast and crew dropdowns
+        $.getJSON('static/top_cast_crew.json', function(data) {
+            function populateDropdown(dropdownName, data) {
+                var $dropdown = $(`#${dropdownName}`);
+                data.forEach(function(name) {
+                    const newOption = new Option(name, name, false, false);
+                    $dropdown.append(newOption);
+                });
+            }
+            populateDropdown('top_cast', data['top_cast']);
+            populateDropdown('top_crew', data['top_crew']);
         });
 
         function BudgetSlider(options) {
