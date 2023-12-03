@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                       tooltip.transition()
                       .duration(200)
                       .style("opacity", .8);
-                      tooltip.html(`Country: ${d.properties.name}<br>Revenue: ${revenue}`)
+                      tooltip.html(`Country: ${d.properties.name}<br>Revenue: $${revenue.toLocaleString('en-US')}`)
                       .style("left", (countryX) + "px")
                       .style("top", (countryY) + "px");
                     }
@@ -66,6 +66,27 @@ document.addEventListener('DOMContentLoaded', (event) => {
    
   }
 
+  const spinner = new Spinner({
+    lines: 13, // The number of lines to draw
+    length: 28, // The length of each line
+    width: 14, // The line thickness
+    radius: 42, // The radius of the inner circle
+    scale: 0.5, // Scales overall size of the spinner
+    corners: 1, // Corner roundness (0..1)
+    color: '#fff', // CSS color or array of colors
+    fadeColor: 'transparent', // CSS color or array of colors to use for the lines
+    speed: 1, // Rounds per second
+    rotate: 0, // The rotation offset
+    animation: 'spinner-line-fade-quick', // The CSS animation name for the lines
+    direction: 1, // 1: clockwise, -1: counterclockwise
+    zIndex: 2e9, // The z-index (defaults to 2000000000)
+    className: 'spinner', // The CSS class to assign to the spinner
+    top: '50%', // Top position relative to parent
+    left: '50%', // Left position relative to parent
+    shadow: '0 0 1px transparent', // Box-shadow for the lines
+    position: 'absolute', // Element positioning
+  }).spin();
+
   document.getElementById('predict').addEventListener('click', function () {
 
     console.log('Button clicked');
@@ -74,20 +95,27 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const budget = document.getElementById('budget').value;
     // const country = document.getElementById('country').value;
     const language = document.getElementById('language').value;
+    const genres = $('#genres').select2('data').map(d => d.text);
+    spinner.spin(document.body);
 
     // Make an API request to your Flask server
     fetch('/predict', {
       method: 'POST',
-      body: JSON.stringify({ prompt, budget, language }),
+      body: JSON.stringify({ prompt, budget, language, genres }),
       headers: {
         'Content-Type': 'application/json',
       },
     })
       .then((response) => response.json())
       .then((data) => {
+        spinner.stop();
         // Handle the API response here
         // You can update the chart or display the result as needed
         console.log('API Response:', data);
+        const overallRevenue = data.revenueData[data.revenueData.length - 1].revenue;
+        // Set the text for the overall revenue to overallRevenue in USD and with commas in the thousands
+        $('#overallRevenue').text(`$${overallRevenue.toLocaleString('en-US')}`);
+        data.revenueData.pop();
         generateChoroplethMap(data.revenueData);
       })
       .catch((error) => {

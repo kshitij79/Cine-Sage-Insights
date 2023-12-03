@@ -145,7 +145,7 @@ class OverallRevenuePredictor():
             budget_unknown = torch.tensor([1], dtype=torch.float).to(DEVICE)
 
         input = torch.cat((input_ids, attention_mask, original_language, cast, crew, budget, budget_unknown, genres), dim=0).unsqueeze(0)
-        return self.model(input).item() * 1e8
+        return int(self.model(input).item() * 1e8)
 
 if __name__ == '__main__':
     predictor = OverallRevenuePredictor()

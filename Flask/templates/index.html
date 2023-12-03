@@ -11,6 +11,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
     <!-- <script src="static/choropleth_map.js"></script> -->
     <style>
         body {
@@ -207,6 +208,11 @@
     <button id="predict">Predict Revenue</button>
 
     <div>
+        <h2 style="text-align: center;">Predicted worldwide revenue:</h2>
+        <h2 id="overallRevenue" style="text-align: center;"></h2>
+    </div>
+
+    <div>
         <h2>Country-wise Revenue:</h2>
         <div id="revenueChart"> </div>
     </div>
@@ -231,29 +237,31 @@
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        const languageList = ['Abkhazian', 'Afrikaans', 'Amharic', 
-        'Arabic', 'Aymara', 'Bulgarian', 'Bambara', 'Bengali', 'Tibetan', 
-        'Bosnian', 'Catalan', 'Chinese', 'Czech', 'Welsh', 'Danish', 'German', 
-        'Greek', 'English', 'Esperanto', 'Spanish', 'Estonian', 'Basque', 'Persian', 'Finnish', 
-        'French', 'Frisian', 'Galician', 'Hebrew', 'Hindi', 'Croatian', 'Hungarian', 'Armenian', 
-        'Indonesian', 'Icelandic', 'Italian', 'Inuktitut', 'Japanese', 'Javanese', 'Georgian', 'Kazakh', 
-        'Kannada', 'Korean', 'Kurdish', 'Kyrgyz', 'Latin', 'Luxembourgish', 'Lao', 'Lithuanian', 'Latvian', 'Macedonian', 'Malayalam', 
-        'Mongolian', 'Marathi', 'Malay', 'Maltese', 'Norwegian Bokmål', 'Nepali', 'Dutch', 'Norwegian', 'Punjabi', 'Polish', 'Pashto', 
-        'Portuguese', 'Quechua', 'Romanian', 'Russian', 'Kinyarwanda', 'Serbo-Croatian', 'Sinhalese', 'Slovak', 'Slovenian', 'Samoan', 
-        'Albanian', 'Serbian', 'Swedish', 'Tamil', 'Telugu', 'Tajik', 'Thai', 'Tagalog', 'Turkish', 'Ukrainian', 'Urdu', 'Uzbek', 
-        'Vietnamese', 'Wolof', 'Unknown', 'Chinese', 'Zulu', 'Nan']
-
         // Select the language dropdown
         const languageDropdown = document.getElementById('language');
 
-        // Add options to the dropdown
-        languageList.forEach((language) => {
-            const option = document.createElement('option');
-            option.value = language;
-            option.textContent = language;
-            languageDropdown.appendChild(option);
+        // Load the language codes from 'static/language_codes.json'
+        $.getJSON('static/language_codes.json', function(data) {
+            const languageList = ['Abkhazian', 'Afrikaans', 'Amharic', 
+                'Arabic', 'Aymara', 'Bulgarian', 'Bambara', 'Bengali', 'Tibetan', 
+                'Bosnian', 'Catalan', 'Chinese', 'Czech', 'Welsh', 'Danish', 'German', 
+                'Greek', 'English', 'Esperanto', 'Spanish', 'Estonian', 'Basque', 'Persian', 'Finnish', 
+                'French', 'Frisian', 'Galician', 'Hebrew', 'Hindi', 'Croatian', 'Hungarian', 'Armenian', 
+                'Indonesian', 'Icelandic', 'Italian', 'Inuktitut', 'Japanese', 'Javanese', 'Georgian', 'Kazakh', 
+                'Kannada', 'Korean', 'Kurdish', 'Kyrgyz', 'Latin', 'Luxembourgish', 'Lao', 'Lithuanian', 'Latvian', 'Macedonian', 'Malayalam', 
+                'Mongolian', 'Marathi', 'Malay', 'Maltese', 'Norwegian Bokmål', 'Nepali', 'Dutch', 'Norwegian', 'Punjabi', 'Polish', 'Pashto', 
+                'Portuguese', 'Quechua', 'Romanian', 'Russian', 'Kinyarwanda', 'Serbo-Croatian', 'Sinhalese', 'Slovak', 'Slovenian', 'Samoan', 
+                'Albanian', 'Serbian', 'Swedish', 'Tamil', 'Telugu', 'Tajik', 'Thai', 'Tagalog', 'Turkish', 'Ukrainian', 'Urdu', 'Uzbek', 
+                'Vietnamese', 'Wolof', 'Unknown', 'Chinese', 'Zulu', 'Nan']
+            languageList.forEach((language) => {
+                const option = document.createElement('option');
+                option.value = data[language];
+                option.textContent = language;
+                languageDropdown.appendChild(option);
+            });
+            languageDropdown.value = 'en';
         });
-        languageDropdown.value = 'English';
+
         // document.getElementById('revenueChart').appendChild(choropleth_map());
 
         // After a user is done typing, fill out genres (if not already filled out by user) using the API

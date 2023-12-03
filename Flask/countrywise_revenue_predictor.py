@@ -136,10 +136,10 @@ class CountrywiseRevenuePredictor():
         '''
         movie_data: list of dictionaries, each dictionary contains the following keys:
             - overview: string, overview of the movie, required
-            - original_language: string, original language of the movie
-            - cast: list of strings, names of the cast
-            - crew: list of strings, names of the crew
-            - genre_list: list of strings, genres of the movie
+            - genre_list: list of strings, genres of the movie, required
+            - original_language: string, original language of the movie (optional)
+            - cast: list of strings, names of the cast (optional)
+            - crew: list of strings, names of the crew (optional)
             - budget: int, budget of the movie (optional)
         '''
         encoded = self.tokenizer.encode_plus(
@@ -152,9 +152,9 @@ class CountrywiseRevenuePredictor():
         original_language[self.original_language_cols.index(
             movie_data['original_language'] if 'original_language' in movie_data else 'en'
         )] = 1
-        genres = self.get_genre_tensor(movie_data['genre_list'])
-        cast = self.get_cast_tensor(movie_data['cast'])
-        crew = self.get_crew_tensor(movie_data['crew'])
+        genres = self.get_genre_tensor(movie_data['genre_list'] if 'genre_list' in movie_data else [])
+        cast = self.get_cast_tensor(movie_data['cast'] if 'cast' in movie_data else [])
+        crew = self.get_crew_tensor(movie_data['crew'] if 'crew' in movie_data else [])
         if 'budget' in movie_data and movie_data['budget'] != 0:
             budget = torch.tensor([movie_data['budget'] / self.revenue_scale], device=DEVICE)
             budget_unknown = torch.tensor([0], device=DEVICE)
@@ -178,12 +178,11 @@ class WorldWideRevenuePredictor():
         '''
         movie_data: list of dictionaries, each dictionary contains the following keys:
             - overview: string, overview of the movie, required
-            - original_language: string, original language of the movie
-            - cast: list of strings, names of the cast
-            - crew: list of strings, names of the crew
-            - genre_list: list of strings, genres of the movie
+            - genre_list: list of strings, genres of the movie, required
+            - original_language: string, original language of the movie (optional)
+            - cast: list of strings, names of the cast (optional)
+            - crew: list of strings, names of the crew (optional)
             - budget: int, budget of the movie (optional)
-            - country_code: string, country code of the country for which revenue is to be predicted
         '''
         revenues = {}
         def cap(rev, limit):

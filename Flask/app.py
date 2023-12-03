@@ -1,58 +1,62 @@
 from flask import Flask, request, jsonify, render_template
 from genre_prediction import GenrePredictor
-from utils import inverted_language_mapping
+from countrywise_revenue_predictor import WorldWideRevenuePredictor
+from overall_revenue_predictor import OverallRevenuePredictor
+# from utils import inverted_language_mapping
 
 app = Flask(__name__, static_folder='static')
 genre_predictor = GenrePredictor()
+overall_revenue_predictor = OverallRevenuePredictor()
+worldwide_revenue_predictor = WorldWideRevenuePredictor()
 
-# Replace with your BERT model loading and prediction code
-def predict_revenue(prompt, budget, language):
-    # print(prompt, budget, country, language)
-    # This is dummy data for illustration purposes
-    return [
-        {"country": "USA", "revenue": budget*5},
-        {"country": "UK", "revenue": budget*2},
-        {"country": "India", "revenue": budget*1.5},
-    ]
+# # Replace with your BERT model loading and prediction code
+# def predict_revenue(prompt, budget, language):
+#     # print(prompt, budget, country, language)
+#     # This is dummy data for illustration purposes
+#     return [
+#         {"country": "USA", "revenue": budget*5},
+#         {"country": "UK", "revenue": budget*2},
+#         {"country": "India", "revenue": budget*1.5},
+#     ]
 
-def random_predict_revenue(prompt, budget, language):
+# def random_predict_revenue(prompt, budget, language):
 
-    if language not in inverted_language_mapping:
-        language = "en"
-    else:    
-        original_language = inverted_language_mapping[language]
+#     if language not in inverted_language_mapping:
+#         language = "en"
+#     else:    
+#         original_language = inverted_language_mapping[language]
         
-    print(prompt, budget, original_language)
-    language_to_countries = {
-        "en": ["USA", "UK", "India", "Australia", "Canada"],
-        "es": ["Argentina", "Mexico", "Spain"],
-        "fr": ["France", "Canada"],
-        "de": ["Germany", "Austria", "Switzerland"],
-        "ko": ["South Korea"],
-        "zh": ["Taiwan"],
-        "hi": ["India"],
-        "pt": ["Brazil", "Portugal"]
-        # Add more languages and countries as needed
-    }
+#     print(prompt, budget, original_language)
+#     language_to_countries = {
+#         "en": ["USA", "UK", "India", "Australia", "Canada"],
+#         "es": ["Argentina", "Mexico", "Spain"],
+#         "fr": ["France", "Canada"],
+#         "de": ["Germany", "Austria", "Switzerland"],
+#         "ko": ["South Korea"],
+#         "zh": ["Taiwan"],
+#         "hi": ["India"],
+#         "pt": ["Brazil", "Portugal"]
+#         # Add more languages and countries as needed
+#     }
 
-    eligible_countries = language_to_countries.get(original_language, ["USA", "UK", "India"])
+#     eligible_countries = language_to_countries.get(original_language, ["USA", "UK", "India"])
 
-    # Randomly selecting countries and calculating revenues
-    random_countries = random.sample(eligible_countries, k=len(eligible_countries))
-    results = []
-    for country in random_countries:
-        if country == "USA":
-            revenue = random.uniform(4, 6) * budget  # Random multiplier between 4 and 6
-        elif country == "UK":
-            revenue = random.uniform(1.5, 2.5) * budget  # Random multiplier between 1.5 and 2.5
-        elif country == "India":
-            revenue = random.uniform(1, 2) * budget  # Random multiplier between 1 and 2
-        else:
-            revenue = random.uniform(0.5, 1.5) * budget  # Default case for other countries
+#     # Randomly selecting countries and calculating revenues
+#     random_countries = random.sample(eligible_countries, k=len(eligible_countries))
+#     results = []
+#     for country in random_countries:
+#         if country == "USA":
+#             revenue = random.uniform(4, 6) * budget  # Random multiplier between 4 and 6
+#         elif country == "UK":
+#             revenue = random.uniform(1.5, 2.5) * budget  # Random multiplier between 1.5 and 2.5
+#         elif country == "India":
+#             revenue = random.uniform(1, 2) * budget  # Random multiplier between 1 and 2
+#         else:
+#             revenue = random.uniform(0.5, 1.5) * budget  # Default case for other countries
 
-        results.append({"country": country, "revenue": revenue})
-    print(results)
-    return results
+#         results.append({"country": country, "revenue": revenue})
+#     print(results)
+#     return results
 
 
 # predict_revenues(prompt, original_language, genres, budget)
@@ -68,14 +72,18 @@ def index_cluster():
 def predict():
     data = request.get_json()
     print(data)
-    prompt = data['prompt']
-    budget = int(data['budget'])
-    # country = data['country']
-    language = data['language']
-
-    revenueData =  random_predict_revenue(prompt, budget, language) #predict_revenues(prompt, language, [], budget)
     
-    return jsonify({'revenueData': revenueData})
+    movie_data = {
+        'overview': data['prompt'],
+        'budget': int(data['budget']),
+        'original_language': data['language'],
+        'genre_list': data['genres']
+    }
+    revenue_data = []
+    for country, revenue in worldwide_revenue_predictor.predict_revenues(movie_data).items():
+        revenue_data.append({'country': country, 'revenue': revenue})
+    revenue_data.append({'country': 'Overall', 'revenue': overall_revenue_predictor.predict_revenue(movie_data)})
+    return jsonify({'revenueData': revenue_data})
 
 # Add endpoint for /api/genres to return the list of genres predicted by the model
 @app.route('/api/genres', methods=['POST'])
