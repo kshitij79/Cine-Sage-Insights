@@ -11,13 +11,12 @@ TOP_CREW = pd.read_csv('static/top_crew_country_wise.csv')
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-COUNTRIES = ['Argentina', 'Australia', 'Austria', 'Belgium', 'Domestic', 
-             'South Korea', 'Spain', 'Taiwan', 'United Kingdom', 'France', 
-            #  'Germany', 
-            #  'Italy',
-            #  'Mexico',
-            #  'Netherlands'
-             ]
+COUNTRIES = [
+    'Argentina', 'Australia', 'Austria', 'Belgium', 'Domestic', 
+    'South Korea', 'Spain', 'Taiwan', 'United Kingdom', 'France', 
+    'Germany', 'Italy', 'Mexico', 'Netherlands',
+    'New Zealand', 'Portugal', 'Russia/CIS'
+]
 COUNTRY_WISE_CONFIG_PATH = 'static/country_wise_config.json'
 
 class CountrywiseRevenuePredictorModel(nn.Module):
@@ -210,6 +209,8 @@ class WorldWideRevenuePredictor():
                 result_country = 'United States of America'
             elif country == 'South Korea':
                 result_country = 'Korea, South'
+            elif country == 'Russia/CIS':
+                result_country = 'Russia'
             predicted_revenue = int(cap(predicted_revenue, self.caps[country] if country in self.caps else 1e6))
             revenues[result_country] = predicted_revenue
             sum_revenues += predicted_revenue
