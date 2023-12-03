@@ -11,3 +11,6 @@ credits.csv
 ratings.csv
 
 *.pth
+
+Flask/static/genre_prediction_model/
+Flask/static/saved_models/
