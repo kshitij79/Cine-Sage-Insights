@@ -22,6 +22,8 @@ def prepare_name_to_col_dict(df, cols_order):
 
 OVERALL_TOP_CAST = prepare_name_to_col_dict(pd.read_csv('static/top_cast.csv'), OVERALL_CAST_COLS_ORDER)
 OVERALL_TOP_CREW = prepare_name_to_col_dict(pd.read_csv('static/top_crew.csv'), OVERALL_CREW_COLS_ORDER)
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
 class OverallRevenuePredictorModel(nn.Module):
     def __init__(self, bert_embedding_size = 128, original_language_embedding_size = 32, cast_embedding_size = 32, crew_embedding_size = 32, hidden_size = 256):
@@ -83,20 +85,19 @@ class OverallRevenuePredictor():
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.model.load_state_dict(torch.load(
             MODEL_DIR + "overall_revenue_model_leakyReLU_hidden_192_bert_192_lang_16_cast_32_crew_16_batch_64.pth",
-            map_location=torch.device('cpu')
+            map_location=DEVICE
         ))
         self.model.eval()
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     def get_cast_tensor(self, cast_names):
-        cast_tensor = torch.zeros(NUM_CAST, device=self.device)
+        cast_tensor = torch.zeros(NUM_CAST, device=DEVICE)
         for name in cast_names:
             if name in OVERALL_TOP_CAST:
                 cast_tensor[OVERALL_TOP_CAST[name]] = 1
         return cast_tensor
 
     def get_crew_tensor(self, crew_names):
-        crew_tensor = torch.zeros(NUM_CREW, device=self.device)
+        crew_tensor = torch.zeros(NUM_CREW, device=DEVICE)
         for name in crew_names:
             if name in OVERALL_TOP_CREW:
                 crew_tensor[OVERALL_TOP_CREW[name]] = 1
@@ -104,7 +105,7 @@ class OverallRevenuePredictor():
 
 
     def get_genre_tensor(self, genres):
-        genre_tensor = torch.zeros(NUM_GENRES, device=self.device)
+        genre_tensor = torch.zeros(NUM_GENRES, device=DEVICE)
         for genre in genres:
             if genre in GENRE_COLS_ORDER:
                 genre_tensor[GENRE_COLS_ORDER.index(genre)] = 1
@@ -123,7 +124,7 @@ class OverallRevenuePredictor():
         encoded = self.tokenizer.encode_plus(
             movie_data['overview'], add_special_tokens=True,
             max_length=256, padding='max_length', truncation=True, return_tensors='pt'
-        ).to(self.device)
+        ).to(DEVICE)
         input_ids = encoded["input_ids"].squeeze()
         attention_mask = encoded["attention_mask"].squeeze()
 
@@ -131,21 +132,21 @@ class OverallRevenuePredictor():
 
         language_one_hot = [0] * NUM_ORIGINAL_LANGUAGES
         language_one_hot[ORIGINAL_LANGUAGES.index(movie_data['original_language'] if 'original_language' in movie_data else 'en')] = 1
-        original_language = torch.tensor(language_one_hot, dtype=torch.float).to(self.device)
+        original_language = torch.tensor(language_one_hot, dtype=torch.float).to(DEVICE)
 
         cast = self.get_cast_tensor(movie_data['cast'] if 'cast' in movie_data else [])
         crew = self.get_crew_tensor(movie_data['crew'] if 'crew' in movie_data else [])
 
         if 'budget' in movie_data:
-            budget = torch.tensor([movie_data['budget'] / 1e8], dtype=torch.float).to(self.device)
-            budget_unknown = torch.tensor([0], dtype=torch.float).to(self.device)
+            budget = torch.tensor([movie_data['budget'] / 1e8], dtype=torch.float).to(DEVICE)
+            budget_unknown = torch.tensor([0], dtype=torch.float).to(DEVICE)
         else:
-            budget = torch.tensor([0], dtype=torch.float).to(self.device)
-            budget_unknown = torch.tensor([1], dtype=torch.float).to(self.device)
+            budget = torch.tensor([0], dtype=torch.float).to(DEVICE)
+            budget_unknown = torch.tensor([1], dtype=torch.float).to(DEVICE)
 
         input = torch.cat((input_ids, attention_mask, original_language, cast, crew, budget, budget_unknown, genres), dim=0).unsqueeze(0)
         return self.model(input).item() * 1e8
-    
+
 if __name__ == '__main__':
     predictor = OverallRevenuePredictor()
     test_movies = [
