@@ -11,7 +11,13 @@ TOP_CREW = pd.read_csv('static/top_crew_country_wise.csv')
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-COUNTRIES = ['Argentina', 'Australia', 'Austria', 'Belgium', 'Domestic', 'South Korea', 'Spain', 'Taiwan', 'United Kingdom']
+COUNTRIES = ['Argentina', 'Australia', 'Austria', 'Belgium', 'Domestic', 
+             'South Korea', 'Spain', 'Taiwan', 'United Kingdom', 'France', 
+            #  'Germany', 
+            #  'Italy',
+            #  'Mexico',
+            #  'Netherlands'
+             ]
 COUNTRY_WISE_CONFIG_PATH = 'static/country_wise_config.json'
 
 class CountrywiseRevenuePredictorModel(nn.Module):
@@ -172,9 +178,10 @@ class WorldWideRevenuePredictor():
         config = json.load(open(COUNTRY_WISE_CONFIG_PATH, 'r'))
         self.countrywise_predictors = {}
         for country in COUNTRIES:
+            print("Loading model for ", country) 
             self.countrywise_predictors[country] = CountrywiseRevenuePredictor(config[country], TOP_CAST, TOP_CREW)
 
-    def predict_revenues(self, movie_data):
+    def predict_revenues(self, movie_data, total_revenue):
         '''
         movie_data: list of dictionaries, each dictionary contains the following keys:
             - overview: string, overview of the movie, required
@@ -188,15 +195,25 @@ class WorldWideRevenuePredictor():
         def cap(rev, limit):
             # If rev is greater than limit, convert rev to [0, 1] and scale to limit
             return rev if rev < limit else (limit * rev / (10 ** len(str(int(rev)))))
-            
+        
+        sum_revenues = 0
         for country in COUNTRIES:
             predicted_revenue = abs(self.countrywise_predictors[country].predict_revenue(movie_data))
+            result_country = country
             if country == 'Domestic':
-                country = 'United States'
+                result_country = 'United States of America'
                 predicted_revenue = cap(predicted_revenue, 1e9)
+            elif country == 'South Korea':
+                result_country = 'Korea, South'
+                predicted_revenue = cap(predicted_revenue, 1e8)
             elif predicted_revenue > 1e9:
                 predicted_revenue = cap(predicted_revenue, 1e8)
-            revenues[country] = int(predicted_revenue)
+            revenues[result_country] = int(predicted_revenue)
+            sum_revenues += int(predicted_revenue)
+        if sum_revenues >= total_revenue:
+            scale = 0.9 * total_revenue / sum_revenues
+            for country in revenues:
+                revenues[country] = int(revenues[country] * scale)
         return revenues
 
 if __name__ == '__main__':

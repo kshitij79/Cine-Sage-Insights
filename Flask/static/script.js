@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   function getCountryCode(countryName) {
     // Mapping from country names to three-letter country codes
     const countryCodeMap = {
-        'USA': 'USA', 'UK': 'GBR', 'UAE': 'ARE', 'India': 'IND', 
+        'United States of America': 'USA', 'United Kingdom': 'GBR', 'UAE': 'ARE', 'India': 'IND', 
         'Afghanistan': 'AFG', 'Albania': 'ALB', 'Algeria': 'DZA', 
         'Andorra': 'AND', 'Angola': 'AGO', 'Antigua and Barbuda': 'ATG', 
         'Argentina': 'ARG', 'Armenia': 'ARM', 'Australia': 'AUS', 

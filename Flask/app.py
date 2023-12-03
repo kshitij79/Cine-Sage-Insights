@@ -80,9 +80,10 @@ def predict():
         'genre_list': data['genres']
     }
     revenue_data = []
-    for country, revenue in worldwide_revenue_predictor.predict_revenues(movie_data).items():
+    overall_revenue = int(overall_revenue_predictor.predict_revenue(movie_data))
+    for country, revenue in worldwide_revenue_predictor.predict_revenues(movie_data, overall_revenue).items():
         revenue_data.append({'country': country, 'revenue': revenue})
-    revenue_data.append({'country': 'Overall', 'revenue': overall_revenue_predictor.predict_revenue(movie_data)})
+    revenue_data.append({'country': 'Overall', 'revenue': overall_revenue})
     return jsonify({'revenueData': revenue_data})
 
 # Add endpoint for /api/genres to return the list of genres predicted by the model
