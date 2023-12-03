@@ -1,69 +1,85 @@
 
 document.addEventListener('DOMContentLoaded', (event) => {
-  // Your entire JS code should be here
-  // Define D3.js chart here
-  const margin = { top: 20, right: 30, bottom: 40, left: 50 };
-  const width = 1100 - margin.left - margin.right;
-  const height = 600 - margin.top - margin.bottom;
+    // Your entire JS code should be here
+    // Define D3.js chart here
+    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const width = 1100 - margin.left - margin.right;
+    const height = 600 - margin.top - margin.bottom;
 
-  const svg = d3.select('#revenueChart')
-    .append('svg')
-    .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-    .attr('transform', `translate(${margin.left},${margin.top})`);
+    const svg = d3.select('#revenueChart')
+        .append("svg")
+        .attr("id", "choropleth")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
 
-  function generateChoroplethMap(revenueData) {
-
-    var projection = d3.geoNaturalEarth1().scale(200)
-    var path = d3.geoPath(projection);
+    const countries = svg
+        .append("g")
+        .attr("id", "countries")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
-    var revenueMap = new Map(revenueData.map(d => [getCountryCode(d.country), d.revenue]));
-    // Load external data and boot
-    var colorScale = d3.scaleThreshold()
+    const colorScale = d3.scaleThreshold()
         .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
         .range(d3.schemeReds[4]);
-       
-    d3.selectAll(".tooltip").remove();
-    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
-        .then(world => {
-            // Draw the map
-            svg.append("g")
-                .selectAll("path")
-                .data(world.features)
-                .enter()
-                .append("path")
-                .attr("d", path)
-                .attr("fill", function (d) {
-                    // Use revenue data for coloring
-                    var revenue = revenueMap.get(d.id) || 0;
-                    if (revenue != 0) {
-                      var tooltip = d3.select("body").append("div")
-                      .attr("class", "tooltip tooltip-" + d.id) // Unique class for each tooltip
-                      .style("opacity", 0);
-                      var currentObjectAbsolutePosition = this.getBoundingClientRect();
-                      var countryX = currentObjectAbsolutePosition.x;
 
-                      var countryAbsolutePathLocation = currentObjectAbsolutePosition.y + window.scrollY;
-                      countryX = countryX;
-                      countryY = countryAbsolutePathLocation + 20;
+    const tooltipFunc = revenueMap => d3.tip()
+        .attr("id", "tooltip")
+        .attr("class", "tooltip")
+        .offset([0, 30])
+        .html(d => {
+            const revenue = revenueMap.get(d.id) || 0;
+            return `<strong>Country: </strong><span class='details'>${d.properties.name}<br></span>
+                    <strong>Revenue: </strong><span class='details'>$${revenue.toLocaleString('en-US')}</span>`;
+        });
+    var tooltip;
 
-                      tooltip.transition()
-                      .duration(200)
-                      .style("opacity", .8);
-                      tooltip.html(`Country: ${d.properties.name}<br>Revenue: $${revenue.toLocaleString('en-US')}`)
-                      .style("left", (countryX) + "px")
-                      .style("top", (countryY) + "px");
-                    }
-                    return colorScale(revenue);
-                }).style("pointer-events", "all").on("mouseover", function(event, d) {
-                    console.log(d);
-                })
-                .on("mouseout", function(d) {
-                    console.log(d);
-                });
-        })
-   
+    var projection = d3.geoNaturalEarth1().translate([width / 2, height / 2]).scale(200)
+    var path = d3.geoPath().projection(projection);
+    
+    function generateChoroplethMap(world, revenueData) {
+        tooltip && tooltip.destroy();
+        countries.selectAll("path").remove();
+        const revenueMap = new Map(revenueData.map(d => [getCountryCode(d.country), d.revenue]));
+        tooltip = tooltipFunc(revenueMap);
+        countries.call(tooltip);
+        // Draw the map
+        countries.selectAll("path")
+            .data(world.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .attr("fill", function (d) {
+              // Use revenue data for coloring
+              var revenue = revenueMap.get(d.id) || 0;
+              // if (revenue != 0) {
+              //   var tooltip = d3.select("body").append("div")
+              //     .attr("class", "tooltip tooltip-" + d.id) // Unique class for each tooltip
+              //     .style("opacity", 0);
+
+              //   d3.select(this)
+              //     .style("pointer-events", "all")
+              //     .on("mouseover", function (event, d) {
+              //       tooltip.transition()
+              //         .duration(200)
+              //         .style("opacity", .8);
+              //       tooltip.html(`Country: ${d.properties.name}<br>Revenue: $${revenue.toLocaleString('en-US')}`)
+              //         .style("left", (event.pageX) + "px")
+              //         .style("top", (event.pageY + 20) + "px");
+              //     })
+              //     .on("mouseout", function (d) {
+              //       tooltip.transition()
+              //         .duration(200)
+              //         .style("opacity", 0);
+              //     });
+              // }
+              return colorScale(revenue);
+            })
+            .on("mouseover", function (d, event) {
+                // Show tooltip on hover only if country has revenue data
+                if (revenueMap.has(d.id)) {
+                    tooltip.show(d, event);
+                }
+            })
+            .on("mouseout", tooltip.hide);
   }
 
   const spinner = new Spinner({
@@ -89,7 +105,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   document.getElementById('predict').addEventListener('click', function () {
 
-    console.log('Button clicked');
     // Fetch input values
     const prompt = document.getElementById('prompt').value;
     const budget = document.getElementById('budget').value;
@@ -100,16 +115,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const top_crew = $('#top_crew').select2('data').map(d => d.text);
     spinner.spin(document.body);
 
-    // Make an API request to your Flask server
-    fetch('/predict', {
-      method: 'POST',
-      body: JSON.stringify({ prompt, budget, language, genres, top_cast, top_crew }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
+    
+    Promise.all([
+        fetch('/predict', {
+        method: 'POST',
+        body: JSON.stringify({ prompt, budget, language, genres, top_cast, top_crew }),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        })
+        .then((response) => response.json()),
+        d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
+    ])
+      .then(([data, world]) => {
         spinner.stop();
         // Handle the API response here
         // You can update the chart or display the result as needed
@@ -118,7 +136,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // Set the text for the overall revenue to overallRevenue in USD and with commas in the thousands
         $('#overallRevenue').text(`$${overallRevenue.toLocaleString('en-US')}`);
         data.revenueData.pop();
-        generateChoroplethMap(data.revenueData);
+        generateChoroplethMap(world, data.revenueData);
       })
       .catch((error) => {
         console.error(error);
