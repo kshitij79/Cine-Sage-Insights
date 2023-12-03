@@ -1,7 +1,21 @@
 # CineSage Insights - A Predictive and Visualization Tool for Filmmakers
 ## CSE 6242 A Team 20
 
-CineSage Insights is a project designed to redefine the movie production planning process by integrating data analysis and visualizations. This tool is specifically tailored for filmmakers, offering a novel approach to making data-driven decisions. It factors in various aspects such as plot premise, budget, star cast, release time-frame, and targeted geographies, enabling a comprehensive prediction and visualization of a movie's potential success and revenue.
+CineSage Insights is an innovative tool designed to revolutionize movie production planning through the integration of data analysis and visualization. Aimed at assisting filmmakers, it leverages a data-driven approach to influence decisions in various production stages. The tool considers key factors such as plot premise, budget, cast, release schedule, and target markets, providing predictions and visualizations regarding a film's potential success and revenue.
+
+### Description
+CineSage Insights combines advanced analytics with intuitive visualizations to guide filmmakers in their decision-making process. By analyzing data on previous movie performances, current market trends, and audience preferences, this tool offers valuable insights into the most profitable genres, optimal budget allocations, star cast impact, and suitable release windows.
+
+### Installation
+1. Clone the repository: `git clone https://github.com/CineSageInsights/repository.git`
+2. Navigate to the project directory: `cd CineSageInsights`
+3. Install required dependencies: `pip install -r requirements.txt`
+
+### Execution
+To explore CineSage Insights:
+1. Run the Flask app: `python Flask/app.py`
+2. Open a web browser and go to `http://localhost:5000/` to access the tool.
+3. Explore the various features like revenue prediction, and genre-cluster analysis through the web interface.
 
 ### Live Demo
 https://cinesageinsights.azurewebsites.net/
@@ -36,11 +50,8 @@ The repository is organized as follows:
 - `scripts/`: Scripts used for data scraping and processing.
 - `README.md`: General information and overview of the repository.
 
-### Getting Started
-To get started with CineSage Insights, clone the repository and explore the various directories to understand the structure and components of the project.
-
 ### Contribution
-This project is a collaborative effort of Team 20 in CSE 6242. Contributions are welcome to enhance the tool's capabilities and accuracy.
+This project is a collaborative effort of Team 20 in CSE 6242.
 
 ---
 
