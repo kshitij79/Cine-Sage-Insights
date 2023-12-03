@@ -39,9 +39,12 @@ class GenrePredictor:
         outputs = self.model(**inputs)
         probs = torch.nn.Sigmoid()(outputs.logits)
         preds = (probs >= self.sigmoid_threshold).long().cpu().numpy()
-        predicted_genres = [self.id2genre[i] for i, pred in enumerate(preds[0]) if pred == 1]
+        # Get predicted genres and their corresponding probabilities
+        predicted_genres = {}
+        for i, genre in enumerate(self.genres):
+            if preds[0][i] == 1:
+                predicted_genres[genre] = probs[0][i].item()
         return predicted_genres
-
 
 if __name__ == '__main__':
     test_movies = [

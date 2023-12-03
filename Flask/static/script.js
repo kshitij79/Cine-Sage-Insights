@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const margin = { top: 20, right: 30, bottom: 40, left: 50 };
     const width = 1100 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
+    const legendWidth = 110;
 
     const svg = d3.select('#revenueChart')
         .append("svg")
@@ -20,6 +21,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const colorScale = d3.scaleThreshold()
         .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
         .range(d3.schemeReds[4]);
+
+    // Legend with labels in USD using shorthands like M for million and K for thousand
+    const legend = d3.legendColor().scale(colorScale).labels(
+        ["< $100K", "$100K - $1M", "$1M - $10M", "$10M - $30M", "$30M - $100M", "$100M - $500M", "> $500M"].map(d => {
+            const [min, max] = d.split(' - ');
+            return `${min} ${max ? '-' + max : ''}`;
+        }
+    ));
+    const legendG = svg.append("g")
+        .attr("id", "legend")
+        .attr("transform", "translate(" + (width - legendWidth + 50) + "," + (margin.top) + ")")
+        .attr("display", "none")
+        .call(legend);
 
     const tooltipFunc = revenueMap => d3.tip()
         .attr("id", "tooltip")
@@ -38,6 +52,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     function generateChoroplethMap(world, revenueData) {
         tooltip && tooltip.destroy();
         countries.selectAll("path").remove();
+        legendG.attr("display", "block");
         const revenueMap = new Map(revenueData.map(d => [getCountryCode(d.country), d.revenue]));
         tooltip = tooltipFunc(revenueMap);
         countries.call(tooltip);
@@ -134,7 +149,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         console.log('API Response:', data);
         const overallRevenue = data.revenueData[data.revenueData.length - 1].revenue;
         // Set the text for the overall revenue to overallRevenue in USD and with commas in the thousands
-        $('#overallRevenue').text(`$${overallRevenue.toLocaleString('en-US')}`);
+        $('#overallRevenue').text(`Worldwide revenue: $${overallRevenue.toLocaleString('en-US')}`);
         data.revenueData.pop();
         generateChoroplethMap(world, data.revenueData);
       })

@@ -5,7 +5,7 @@ from overall_revenue_predictor import OverallRevenuePredictor
 import random
 
 app = Flask(__name__, static_folder='static')
-genre_predictor = GenrePredictor()
+genre_predictor = GenrePredictor(sigmoid_threshold=0.4)
 
 USE_RANDOM = True
 
