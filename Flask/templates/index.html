@@ -150,10 +150,10 @@
 
     <div class="form-group">
         <label for="prompt">Movie Plot:</label>
-        <textarea id="prompt" rows="6" cols="50"></textarea>
+        <textarea id="prompt" rows="3" cols="50"></textarea>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" style="margin-bottom: 10px;">
         <label for="genres">Genres:</label>
         <select id="genres" class="form-control"  multiple="multiple">
             <option value="Action">Action</option>
@@ -178,7 +178,7 @@
             <option value="Western">Western</option>
         </select>
     </div>
-    <span id="genreSuggestionsSpan" style="margin-top: 10px;">
+    <span id="genreSuggestionsSpan">
         Suggested genres:
         <div id="genreSuggestions" style="margin-left: 10px; display: inline-block;"></div>
     </span>
@@ -186,9 +186,9 @@
 
 
     <div class="form-group">
-        <label for="budget">Budget (0 - 30 million):</label>
-        <input type="range" id="budget" min="0" max="30000000" step="100000" value="15000000" oninput="updateBudgetValue()">
-        <span id="budgetValue">15,000,000</span>
+        <label for="budget">Budget ($1M - $200M):</label>
+        <input type="range" id="budget" min="0" max="100">
+        <span id="budgetValue">$ 25,000,000</span>
     </div>
 
     <!-- <div class="form-group">
@@ -205,7 +205,10 @@
         </select>
     </div>
 
-    <button id="predict">Predict Revenue</button>
+    <div style="text-align: center;">
+        <button id="predict" style="margin-bottom: 10px; background-color: #2196F3; color: white;">
+        Predict Revenue</button>
+    </div>
 
     <div>
         <h2 style="text-align: center; display: inline;">Predicted worldwide revenue:</h2>
@@ -226,16 +229,35 @@
                 multiple: true,
             });
         });
-        function updateBudgetValue() {
-            const budgetInput = document.getElementById('budget');
-            const budgetValueSpan = document.getElementById('budgetValue');
-            budgetValueSpan.textContent = numberWithCommas(budgetInput.value);
-        }
 
-        // Function to add commas to a number for better readability
-        function numberWithCommas(x) {
-            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        function BudgetSlider(options) {
+            options = options || {};
+            this.minPos = options.minPos;
+            this.minVal = Math.log(options.minVal);
+            this.maxVal = Math.log(options.maxVal);
+            this.scale = (this.maxVal - this.minVal) / (options.maxPos - this.minPos);
         }
+        
+        BudgetSlider.prototype = {
+            value: function(position) {
+                return Math.exp((position - this.minPos) * this.scale + this.minVal);
+            },
+            position: function(value) {
+                return this.minPos + (Math.log(value) - this.minVal) / this.scale;
+            }
+        };
+        
+        const budgetSlider = new BudgetSlider({
+            minPos: 0,
+            maxPos: 100,
+            minVal: 1000000,
+            maxVal: 200000000
+        });
+
+        $('#budget').on('input', function() {
+            const budget = Math.round(budgetSlider.value(+$(this).val()));
+            $('#budgetValue').text(`$ ${budget.toLocaleString()}`);
+        });
 
         // Select the language dropdown
         const languageDropdown = document.getElementById('language');

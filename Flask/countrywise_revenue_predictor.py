@@ -180,6 +180,12 @@ class WorldWideRevenuePredictor():
         for country in COUNTRIES:
             print("Loading model for ", country) 
             self.countrywise_predictors[country] = CountrywiseRevenuePredictor(config[country], TOP_CAST, TOP_CREW)
+        self.caps = {
+            'Domestic': 1e9,
+            'United Kingdom': 1e7,
+            'Australia': 1e7,
+            'France': 1e7,
+        }
 
     def predict_revenues(self, movie_data, total_revenue):
         '''
@@ -202,14 +208,11 @@ class WorldWideRevenuePredictor():
             result_country = country
             if country == 'Domestic':
                 result_country = 'United States of America'
-                predicted_revenue = cap(predicted_revenue, 1e9)
             elif country == 'South Korea':
                 result_country = 'Korea, South'
-                predicted_revenue = cap(predicted_revenue, 1e8)
-            elif predicted_revenue > 1e9:
-                predicted_revenue = cap(predicted_revenue, 1e8)
-            revenues[result_country] = int(predicted_revenue)
-            sum_revenues += int(predicted_revenue)
+            predicted_revenue = int(cap(predicted_revenue, self.caps[country] if country in self.caps else 1e6))
+            revenues[result_country] = predicted_revenue
+            sum_revenues += predicted_revenue
         if sum_revenues >= total_revenue:
             scale = 0.9 * total_revenue / sum_revenues
             for country in revenues:
