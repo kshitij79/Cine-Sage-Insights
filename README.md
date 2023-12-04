@@ -10,12 +10,14 @@ CineSage Insights combines advanced analytics with intuitive visualizations to g
 1. Clone the repository: `git clone https://github.com/CineSageInsights/repository.git`
 2. Navigate to the project directory: `cd CineSageInsights`
 3. Install required dependencies: `pip install -r requirements.txt`
+4. Download the trained models from [here](https://gtvault-my.sharepoint.com/:f:/g/personal/avikram33_gatech_edu/EnLVtBf-kWVBgX9JQiuqbvoBrEDW55tyaJsYAq3neAO_rQ?e=srMUl1) (exclude backup_models directory) and place them in the `Flask/static/` directory. Place individual models in a `saved_models` directory inside `Flask/static/`.
 
 ### Execution
 To explore CineSage Insights:
-1. Run the Flask app: `python Flask/app.py`
-2. Open a web browser and go to `http://localhost:5000/` to access the tool.
-3. Explore the various features like revenue prediction, and genre-cluster analysis through the web interface.
+1. To run with trained models, set `USE_RANDOM = False` in `Flask/app.py`.
+2. Run the Flask app: `python Flask/app.py`
+3. Open a web browser and go to `http://localhost:5000/` to access the tool.
+4. Explore the various features like revenue prediction, and genre-cluster analysis through the web interface.
 
 ### Live Demo
 https://cinesageinsights.azurewebsites.net/
